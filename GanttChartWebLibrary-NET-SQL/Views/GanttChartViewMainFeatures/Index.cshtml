@@ -1,0 +1,40 @@
+﻿@using System.Drawing;
+@using DlhSoft.Web.Mvc;
+@using System.Web.UI.WebControls;
+@{
+    ViewBag.Title = "GanttChartView – Main features";
+}
+
+<div class="row">
+    <div class="col-md-12">
+
+        @(Html.GanttChartView(component =>
+        {
+            // Optionally, add supplemental columns. Note that columns obtained using get*Template client side method calls are using invariant culture, tough.
+            component.Columns.Insert(2, new Column { Header = string.Empty, Width = 40, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getIndexColumnTemplate()(item);", AllowUserToResize = false });
+            component.Columns.Insert(5, new Column { Header = "Effort (h)", Width = 80, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getTotalEffortColumnTemplate(64)(item);" });
+            component.Columns.Insert(6, new Column { Header = "Duration (d)", Width = 80, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getDurationColumnTemplate(64, 8)(item);" });
+            component.Columns.Insert(10, new Column { Header = "%", Width = 80, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getCompletionColumnTemplate(64)(item);" });
+            component.Columns.Insert(11, new Column { Header = "Predecessors", Width = 100, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getPredecessorsColumnTemplate(84)(item);" });
+            component.Columns.Add(new Column { Header = "Cost ($)", Width = 100, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getCostColumnTemplate(84)(item);" });
+            component.Columns.Add(new Column { Header = "Est. start", Width = 140, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getBaselineStartColumnTemplate(124, true, true, 8 * 60 * 60 * 1000)(item);" }); // 8 AM
+            component.Columns.Add(new Column { Header = "Est. finish", Width = 140, CellTemplateClientCode = "return DlhSoft.Controls.GanttChartView.getBaselineFinishColumnTemplate(124, true, true, 16 * 60 * 60 * 1000)(item);" }); // 4 PM
+
+            component.IsBaselineVisible = true;
+            component.AreTaskDependencyConstraintsEnabled = true;
+
+            component.AlternativeRowBackColor = Color.FromArgb(0xff, 0xf8, 0xf8, 0xf8);
+            component.SelectedItemBackColor = Color.LightSkyBlue;
+
+            component.Height = new Unit("450px");
+            component.ItemChangeAction = "GanttChartViewMainFeatures/UpdateGanttChartItem";
+            component.InitializingClientCode = "initializeGanttChart('GanttChartViewMainFeatures', control, 'Generic-bright');";
+
+            DateTime projectStart = component.GetProjectStart(), projectFinish = component.GetProjectFinish();
+            component.TimelineStart = projectStart.Date.AddDays(-7);
+            component.TimelineFinish = projectFinish.Date.AddDays(1).AddMonths(3);
+            component.DisplayedTime = projectStart.Date.AddDays(-1);
+        }))
+
+    </div>
+</div>

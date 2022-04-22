@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Predecessors">
+          <Key>
+            <PropertyRef Name="DependentTaskID" />
+            <PropertyRef Name="PredecessorTaskID" />
+          </Key>
+          <Property Name="DependentTaskID" Type="int" Nullable="false" />
+          <Property Name="PredecessorTaskID" Type="int" Nullable="false" />
+          <Property Name="DependencyType" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tasks">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Index" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Indentation" Type="int" Nullable="false" />
+          <Property Name="Start" Type="datetime" Nullable="false" />
+          <Property Name="Finish" Type="datetime" Nullable="false" />
+          <Property Name="Completion" Type="datetime" Nullable="false" />
+          <Property Name="IsMilestone" Type="bit" Nullable="false" />
+          <Property Name="Assignments" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <Association Name="Tasks_PredecessorHosts">
+          <End Role="Tasks" Type="Self.Tasks" Multiplicity="1" />
+          <End Role="Predecessors" Type="Self.Predecessors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tasks">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Predecessors">
+              <PropertyRef Name="DependentTaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Tasks_Predecessors">
+          <End Role="Tasks" Type="Self.Tasks" Multiplicity="1" />
+          <End Role="Predecessors" Type="Self.Predecessors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tasks">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Predecessors">
+              <PropertyRef Name="PredecessorTaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DatabaseModelStoreContainer">
+          <EntitySet Name="Predecessors" EntityType="Self.Predecessors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tasks" EntityType="Self.Tasks" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="Tasks_PredecessorHosts" Association="Self.Tasks_PredecessorHosts">
+            <End Role="Tasks" EntitySet="Tasks" />
+            <End Role="Predecessors" EntitySet="Predecessors" />
+          </AssociationSet>
+          <AssociationSet Name="Tasks_Predecessors" Association="Self.Tasks_Predecessors">
+            <End Role="Tasks" EntitySet="Tasks" />
+            <End Role="Predecessors" EntitySet="Predecessors" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Predecessor">
+          <Key>
+            <PropertyRef Name="DependentTaskID" />
+            <PropertyRef Name="PredecessorTaskID" />
+          </Key>
+          <Property Name="DependentTaskID" Type="Int32" Nullable="false" />
+          <Property Name="PredecessorTaskID" Type="Int32" Nullable="false" />
+          <Property Name="DependencyType" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="DependentTask" Relationship="Self.Tasks_PredecessorHosts" FromRole="Predecessors" ToRole="Tasks" />
+          <NavigationProperty Name="Task" Relationship="Self.Tasks_Predecessors" FromRole="Predecessors" ToRole="Tasks" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Index" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Indentation" Type="Int32" Nullable="false" />
+          <Property Name="Start" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Finish" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Completion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsMilestone" Type="Boolean" Nullable="false" />
+          <Property Name="Assignments" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Predecessors" Relationship="Self.Tasks_PredecessorHosts" FromRole="Tasks" ToRole="Predecessors" />
+          <NavigationProperty Name="Successors" Relationship="Self.Tasks_Predecessors" FromRole="Tasks" ToRole="Predecessors" />
+        </EntityType>
+        <Association Name="Tasks_PredecessorHosts">
+          <End Role="Tasks" Type="Self.Task" Multiplicity="1" />
+          <End Role="Predecessors" Type="Self.Predecessor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tasks">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Predecessors">
+              <PropertyRef Name="DependentTaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Tasks_Predecessors">
+          <End Role="Tasks" Type="Self.Task" Multiplicity="1" />
+          <End Role="Predecessors" Type="Self.Predecessor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tasks">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Predecessors">
+              <PropertyRef Name="PredecessorTaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DatabaseEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Predecessors" EntityType="Self.Predecessor" />
+          <EntitySet Name="Tasks" EntityType="Self.Task" />
+          <AssociationSet Name="Tasks_PredecessorHosts" Association="Self.Tasks_PredecessorHosts">
+            <End Role="Tasks" EntitySet="Tasks" />
+            <End Role="Predecessors" EntitySet="Predecessors" />
+          </AssociationSet>
+          <AssociationSet Name="Tasks_Predecessors" Association="Self.Tasks_Predecessors">
+            <End Role="Tasks" EntitySet="Tasks" />
+            <End Role="Predecessors" EntitySet="Predecessors" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DatabaseModelStoreContainer" CdmEntityContainer="DatabaseEntities">
+          <EntitySetMapping Name="Predecessors">
+            <EntityTypeMapping TypeName="DatabaseModel.Predecessor">
+              <MappingFragment StoreEntitySet="Predecessors">
+                <ScalarProperty Name="DependentTaskID" ColumnName="DependentTaskID" />
+                <ScalarProperty Name="PredecessorTaskID" ColumnName="PredecessorTaskID" />
+                <ScalarProperty Name="DependencyType" ColumnName="DependencyType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tasks">
+            <EntityTypeMapping TypeName="DatabaseModel.Task">
+              <MappingFragment StoreEntitySet="Tasks">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Index" ColumnName="Index" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Indentation" ColumnName="Indentation" />
+                <ScalarProperty Name="Start" ColumnName="Start" />
+                <ScalarProperty Name="Finish" ColumnName="Finish" />
+                <ScalarProperty Name="Completion" ColumnName="Completion" />
+                <ScalarProperty Name="IsMilestone" ColumnName="IsMilestone" />
+                <ScalarProperty Name="Assignments" ColumnName="Assignments" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
