@@ -7,7 +7,15 @@
 
 <div class="row">
     <div class="col-md-12">
-
+        <div class="ribbonContainer">
+            <div class="ribbonPanel">
+                <div class="ribbonHeader">Items</div>
+                <div class="ribbonCommandsArea">
+                    <div class="ribbonCommand"><a href="javascript:addNewGanttChartItem();" title="Add new item"><img src="~/Images/AddNew.png" /></a></div>
+                    <div class="ribbonCommand"><a href="javascript:deleteGanttChartItem();" title="Remove selected item"><img src="~/Images/Delete.png" /></a></div>
+                </div>
+            </div>
+        </div>
         @(Html.GanttChartView(component =>
         {
             // Optionally, add supplemental columns. Note that columns obtained using get*Template client side method calls are using invariant culture, tough.
@@ -36,5 +44,5 @@
             component.DisplayedTime = projectStart.Date.AddDays(-1);
         }))
 
-    </div>
-</div>
+                </div>
+            </div>

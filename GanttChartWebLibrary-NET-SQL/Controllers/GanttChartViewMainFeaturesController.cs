@@ -113,5 +113,44 @@ namespace GanttChartWebLibrary_NET_SQL.Controllers.Controllers
                 context.SaveChanges();
             }
         }
+
+        [HttpPost]
+        public ActionResult CreateNewGanttChartItem(GanttChartItem item)
+        {
+            // Add a new task to the database.
+            using (var context = new DatabaseEntities())
+            {
+                var task = new Task
+                {
+                    Name = item.Content,
+                    Indentation = item.Indentation,
+                    Start = item.Start,
+                    Finish = item.Finish,
+                    Completion =item.CompletedFinish,
+                    IsMilestone = item.IsMilestone,
+                    Assignments = "",
+                    Index = (context.Tasks.Any() ? context.Tasks.Max(t => t.Index) : 0) + 1
+                };
+                context.Tasks.Add(task);
+                context.SaveChanges();
+                
+                return Json(task.ID);
+            }
+        }
+
+        public ActionResult DeleteGanttChartItem(int id)
+        {
+            // Remove selected task from the database.
+            using (var context = new DatabaseEntities())
+            {
+                var task = context.Tasks.SingleOrDefault(t => t.ID == id);
+                if (task == null)
+                    return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+                context.Tasks.Remove(task);
+                context.SaveChanges();
+            }
+
+            return new HttpStatusCodeResult(HttpStatusCode.OK);
+        }
     }
 }
